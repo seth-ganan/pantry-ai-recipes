@@ -18,8 +18,8 @@ mongoose
   .catch((error) => console.error("❌ Error:", error));
 
 // Import models
-const Task = require("./models/Task");
-const Session = require("./models/Session");
+const Pantry = require("./models/Pantry");
+const Recipe = require("./models/Recipe");
 
 // Root route
 app.get("/", (req, res) => {
