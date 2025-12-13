@@ -18,6 +18,6 @@ const pantrySchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Session = mongoose.model('Pantry', pantrySchema);
+const Pantry = mongoose.model('Pantry', pantrySchema);
 
 module.exports = Pantry;

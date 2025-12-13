@@ -15,6 +15,6 @@ const recipeSchema = new mongoose.Schema({
   timestamps: true
 });
 
-const Session = mongoose.model('Recipe', recipeSchema);
+const Recipe = mongoose.model('Recipe', recipeSchema);
 
 module.exports = Recipe;
