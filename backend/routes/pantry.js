@@ -37,28 +37,32 @@ router.post("/", async (req, res) => {
 
 // PUT update pantry item
 router.post("/", async (req, res) => {
-  console.log("POST body:", req.body);
   const { name, amount } = req.body;
 
-  if (!name || !amount) return res.status(400).json({ error: "Name & amount required" });
+  if (!name || !amount) {
+    return res.status(400).json({ error: "Name & amount required" });
+  }
 
   try {
     const standardized = await standardizeIngredient(name, amount);
-
+    const { quantity, unit } = parseAmount(standardized.amount);
     const normalizedName = standardized.name.trim().toLowerCase();
-    const numericAmount = Number(standardized.amount);
-
-    const existingItem = await Pantry.findOne({ name: { $regex: `^${normalizedName}$`, $options: 'i' } });
+    const existingItem = await Pantry.findOne({
+      name: { $regex: `^${normalizedName}$`, $options: "i" },
+      unit
+    });
 
     if (existingItem) {
-      existingItem.amount = Number(existingItem.amount) + numericAmount;
+      existingItem.quantity += quantity;
       await existingItem.save();
       return res.status(200).json(existingItem);
     }
     const item = await Pantry.create({
       name: standardized.name,
-      amount: numericAmount,
+      quantity,
+      unit
     });
+
     res.status(201).json(item);
   } catch (err) {
     console.error(err);

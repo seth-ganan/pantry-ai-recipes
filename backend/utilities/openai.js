@@ -85,5 +85,26 @@ Output strictly in JSON:
     return { ingredients: [], steps: [] };
   }
 }
+function parseAmount(amountStr) {
+  const match = amountStr.match(/^([\d.\/]+)\s*(.+)$/);
+
+  if (!match) {
+    throw new Error(`Cannot parse amount: ${amountStr}`);
+  }
+
+  let quantity = match[1];
+
+  if (quantity.includes("/")) {
+    const [num, den] = quantity.split("/").map(Number);
+    quantity = num / den;
+  } else {
+    quantity = Number(quantity);
+  }
+
+  const unit = match[2].trim().toLowerCase();
+
+  return { quantity, unit };
+}
+
 
 module.exports = { standardizeIngredient };

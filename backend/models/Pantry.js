@@ -7,14 +7,17 @@ const pantrySchema = new mongoose.Schema(
       required: true,
       trim: true
     },
-    amount: {
-      type: String,
+    quantity: {
+      type: Number,
       required: true
+    },
+    unit: {
+      type: String,
+      required: true,
+      trim: true
     }
   },
   { timestamps: true }
 );
 
-const Pantry = mongoose.model('Pantry', pantrySchema);
-
-module.exports = Pantry;
+module.exports = mongoose.model("Pantry", pantrySchema);
