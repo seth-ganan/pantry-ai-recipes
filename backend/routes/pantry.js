@@ -1,5 +1,7 @@
 const express = require("express");
 const Pantry = require("../models/Pantry");
+const { standardizeIngredient } = require("../utils/openai");
+
 
 const router = express.Router();
 
@@ -21,7 +23,10 @@ router.post("/", async (req, res) => {
   if (!name || !amount) return res.status(400).json({ error: "Name & amount required" });
 
   try {
-    const item = await Pantry.create({ name, amount });
+    const standardized = await standardizeIngredient(name, amount);
+    const item = await Pantry.create({ 
+        name: standardized.name, 
+        amount: standardized.amount});
     res.status(201).json(item);
   } catch (err) {
     console.error(err);
@@ -34,9 +39,10 @@ router.post("/", async (req, res) => {
 router.put("/:id", async (req, res) => {
     try {
         const { name, amount } = req.body;
+        const standardized = await standardizeIngredient(name, amount);
         const item = await Pantry.findByIdAndUpdate(
             req.params.id,
-            { name, amount },
+            { name: standardized.name, amount: standardized.amount },
             { new: true, runValidators: true }
         );
         if (!item) {
