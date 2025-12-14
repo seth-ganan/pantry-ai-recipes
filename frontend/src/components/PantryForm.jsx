@@ -7,25 +7,30 @@ export default function PantryForm({ onAdd }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!name || !amount) return;
-
     onAdd({ name, amount });
     setName("");
     setAmount("");
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
       <input
-        placeholder="Ingredient"
+        type="text"
+        placeholder="Ingredient Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
+        style={{ marginRight: "10px", padding: "5px" }}
       />
       <input
-        placeholder="Amount (e.g. 2 cans)"
+        type="text"
+        placeholder="Amount(ex: 2 cans)"
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
+        style={{ marginRight: "10px", padding: "5px" }}
       />
-      <button type="submit">Add</button>
+      <button type="submit" style={{ padding: "5px 10px" }}>
+        Add
+      </button>
     </form>
   );
 }
