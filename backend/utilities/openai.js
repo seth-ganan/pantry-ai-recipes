@@ -1,9 +1,18 @@
-// utilities/openai.js
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
+function safeParseJSON(text) {
+  try {
+    const match = text.match(/\{.*\}/s);
+    if (!match) return null;
+    return JSON.parse(match[0]);
+  } catch (err) {
+    return null;
+  }
+}
 
 async function standardizeIngredient(name, amount) {
   try {
@@ -16,17 +25,24 @@ async function standardizeIngredient(name, amount) {
         },
         {
           role: "user",
-          content: `Standardize this ingredient:\nName: ${name}\nAmount: ${amount}\nReturn JSON like {"name": "...", "amount": "..."}`
+          content: `Standardize this ingredient:\nName: ${name}\nAmount: ${amount}\nReturn only JSON like {"name": "...", "amount": "..."} with no extra text.`
         }
       ],
-      max_completion_tokens: 50 
+      max_completion_tokens: 50
     });
 
     const text = response.choices[0].message.content.trim();
-    return JSON.parse(text);
+    const parsed = safeParseJSON(text);
+
+    if (!parsed) {
+      console.warn("OpenAI returned invalid JSON, using original values");
+      return { name, amount };
+    }
+
+    return parsed;
   } catch (err) {
     console.error("OpenAI error:", err);
-    return { name, amount }; 
+    return { name, amount };
   }
 }
 
