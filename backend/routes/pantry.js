@@ -45,16 +45,19 @@ router.post("/", async (req, res) => {
   try {
     const standardized = await standardizeIngredient(name, amount);
 
-    const existingItem = await Pantry.findOne({ name: standardized.name });
+    const normalizedName = standardized.name.trim().toLowerCase();
+    const numericAmount = Number(standardized.amount);
+
+    const existingItem = await Pantry.findOne({ name: { $regex: `^${normalizedName}$`, $options: 'i' } });
 
     if (existingItem) {
-      existingItem.amount += standardized.amount;
+      existingItem.amount = Number(existingItem.amount) + numericAmount;
       await existingItem.save();
       return res.status(200).json(existingItem);
     }
     const item = await Pantry.create({
       name: standardized.name,
-      amount: standardized.amount,
+      amount: numericAmount,
     });
     res.status(201).json(item);
   } catch (err) {
@@ -62,6 +65,7 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: "Failed to add pantry item" });
   }
 });
+
 // DELETE pantry item
 router.delete("/:id", async (req, res) => {
     try {
