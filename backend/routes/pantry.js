@@ -1,6 +1,6 @@
 const express = require("express");
 const Pantry = require("../models/Pantry");
-const { standardizeIngredient } = require("../utils/openai");
+const { standardizeIngredient } = require("../utilities/openai");
 
 
 const router = express.Router();
