@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const pantryRoutes = require("./routes/pantry");
+
 
 
 const app = express();
@@ -16,6 +18,8 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use("/api/pantry", pantryRoutes);
+
 
 // MongoDB Connection
 mongoose

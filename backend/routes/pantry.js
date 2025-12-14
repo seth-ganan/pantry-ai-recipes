@@ -1,0 +1,61 @@
+const express = require("express");
+const Pantry = require("../models/Pantry");
+
+const router = express.Router();
+
+// GET all pantry items
+router.get("/", async (req, res) => {
+  try {
+    const items = await Pantry.find().sort({ createdAt: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch pantry items" });
+  }
+});
+
+// POST new pantry item
+router.post("/", async (req, res) => {
+  try {
+    const { name, amount } = req.body;
+
+    if (!name || !amount) {
+      return res.status(400).json({ error: "Name and amount required" });
+    }
+
+    const item = await Pantry.create({ name, amount });
+    res.status(201).json(item);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to add pantry item" });
+  }
+});
+
+// PUT update pantry item
+router.put("/:id", async (req, res) => {
+    try {
+        const { name, amount } = req.body;
+        const item = await Pantry.findByIdAndUpdate(
+            req.params.id,
+            { name, amount },
+            { new: true, runValidators: true }
+        );
+        if (!item) {
+            return res.status(404).json({ error: "Pantry item not found" });
+        }
+        res.json(item);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to update pantry item" });
+    }
+});
+// DELETE pantry item
+router.delete("/:id", async (req, res) => {
+    try {
+        const item = await Pantry.findByIdAndDelete(req.params.id);
+        if (!item) {
+            return res.status(404).json({ error: "Pantry item not found" });
+        }
+        res.json({ message: "Pantry item deleted" });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to delete item" });
+    }
+});
+module.exports = router;
