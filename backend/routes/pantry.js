@@ -36,22 +36,31 @@ router.post("/", async (req, res) => {
 
 
 // PUT update pantry item
-router.put("/:id", async (req, res) => {
-    try {
-        const { name, amount } = req.body;
-        const standardized = await standardizeIngredient(name, amount);
-        const item = await Pantry.findByIdAndUpdate(
-            req.params.id,
-            { name: standardized.name, amount: standardized.amount },
-            { new: true, runValidators: true }
-        );
-        if (!item) {
-            return res.status(404).json({ error: "Pantry item not found" });
-        }
-        res.json(item);
-    } catch (err) {
-        res.status(500).json({ error: "Failed to update pantry item" });
+router.post("/", async (req, res) => {
+  console.log("POST body:", req.body);
+  const { name, amount } = req.body;
+
+  if (!name || !amount) return res.status(400).json({ error: "Name & amount required" });
+
+  try {
+    const standardized = await standardizeIngredient(name, amount);
+
+    const existingItem = await Pantry.findOne({ name: standardized.name });
+
+    if (existingItem) {
+      existingItem.amount += standardized.amount;
+      await existingItem.save();
+      return res.status(200).json(existingItem);
     }
+    const item = await Pantry.create({
+      name: standardized.name,
+      amount: standardized.amount,
+    });
+    res.status(201).json(item);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to add pantry item" });
+  }
 });
 // DELETE pantry item
 router.delete("/:id", async (req, res) => {
