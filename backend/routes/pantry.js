@@ -5,6 +5,55 @@ const { standardizeIngredient } = require("../utilities/openai");
 
 const router = express.Router();
 
+function parseAmount(amountStr) {
+  if (!amountStr || typeof amountStr !== "string") {
+    return { quantity: 1, unit: "unit" };
+  }
+
+  const match = amountStr
+    .trim()
+    .toLowerCase()
+    .match(/^([\d.\/]+)\s*(.+)$/);
+
+  if (!match) {
+    return { quantity: 1, unit: amountStr.toLowerCase() };
+  }
+
+  let quantity = match[1];
+  let unit = match[2];
+
+  if (quantity.includes("/")) {
+    const [num, den] = quantity.split("/").map(Number);
+    quantity = num / den;
+  } else {
+    quantity = Number(quantity);
+  }
+
+  const unitMap = {
+    pound: "lb",
+    pounds: "lb",
+    lbs: "lb",
+    lb: "lb",
+    ounces: "oz",
+    ounce: "oz",
+    oz: "oz",
+    grams: "g",
+    gram: "g",
+    kilograms: "kg",
+    kilogram: "kg",
+    cups: "cup",
+    cup: "cup",
+    cans: "can",
+    can: "can",
+    onions: "onion",
+    onion: "onion"
+  };
+
+  unit = unitMap[unit] || unit;
+
+  return { quantity, unit };
+}
+
 // GET all pantry items
 router.get("/", async (req, res) => {
   try {
