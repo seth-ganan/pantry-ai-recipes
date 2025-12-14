@@ -25,10 +25,18 @@ async function standardizeIngredient(name, amount) {
         },
         {
           role: "user",
-          content: `Standardize this ingredient:\nName: ${name}\nAmount: ${amount}\nReturn only JSON like {"name": "...", "amount": "..."} with no extra text.`
+          content: `Standardize this ingredient.
+Return only valid JSON in this exact format:
+{
+  "name": "standardized name",
+  "amount": "standardized amount"
+}
+Do not include any extra text, explanation, or punctuation.
+Ingredient: Name = {name}, Amount = {amount}
+`
         }
       ],
-      max_completion_tokens: 50
+      max_completion_tokens: 100
     });
 
     const text = response.choices[0].message.content.trim();
