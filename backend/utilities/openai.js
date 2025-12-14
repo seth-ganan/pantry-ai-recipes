@@ -1,10 +1,10 @@
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai");
 
-const configuration = new Configuration({
+const configuration = new OpenAI.Configuration({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-const openai = new OpenAIApi(configuration);
+const openai = new OpenAI.OpenAIApi(configuration);
 
 async function standardizeIngredient(name, amount) {
   try {
