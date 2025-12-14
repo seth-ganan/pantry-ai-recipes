@@ -1,3 +1,4 @@
+// utilities/openai.js
 const OpenAI = require("openai");
 
 const openai = new OpenAI({
@@ -18,14 +19,14 @@ async function standardizeIngredient(name, amount) {
           content: `Standardize this ingredient:\nName: ${name}\nAmount: ${amount}\nReturn JSON like {"name": "...", "amount": "..."}`
         }
       ],
-      max_tokens: 50
+      max_completion_tokens: 50 
     });
 
     const text = response.choices[0].message.content.trim();
     return JSON.parse(text);
   } catch (err) {
     console.error("OpenAI error:", err);
-    return { name, amount }; // fallback
+    return { name, amount }; 
   }
 }
 
