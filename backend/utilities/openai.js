@@ -1,19 +1,17 @@
-const { Configuration, OpenAIApi } = require("openai");
+const OpenAI = require("openai");
 
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-const openai = new OpenAIApi(configuration);
-
 async function standardizeIngredient(name, amount) {
   try {
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: "gpt-5-mini",
       messages: [
         {
           role: "system",
-          content: "You are an assistant that standardizes ingredient names and amounts for a recipe database."
+          content: "You standardize ingredient names and amounts."
         },
         {
           role: "user",
@@ -23,11 +21,11 @@ async function standardizeIngredient(name, amount) {
       max_tokens: 50
     });
 
-    const text = response.data.choices[0].message.content.trim();
+    const text = response.choices[0].message.content.trim();
     return JSON.parse(text);
   } catch (err) {
     console.error("OpenAI error:", err);
-    return { name, amount };
+    return { name, amount }; // fallback
   }
 }
 
