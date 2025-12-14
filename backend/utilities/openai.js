@@ -25,15 +25,9 @@ async function standardizeIngredient(name, amount) {
         },
         {
           role: "user",
-          content: `Standardize this ingredient.
-Return only valid JSON in this exact format:
-{
-  "name": "standardized name",
-  "amount": "standardized amount"
-}
-Do not include any extra text, explanation, or punctuation.
-Ingredient: Name = {name}, Amount = {amount}
-`
+          content: `Standardize this ingredient. Return only a single JSON object with keys "name" and "amount". Do not include any text or explanation outside the JSON.
+Name: ${name}
+Amount: ${amount}`
         }
       ],
       max_completion_tokens: 100
@@ -42,7 +36,7 @@ Ingredient: Name = {name}, Amount = {amount}
     const text = response.choices[0].message.content.trim();
     const parsed = safeParseJSON(text);
 
-    if (!parsed) {
+    if (!parsed || !parsed.name || !parsed.amount) {
       console.warn("OpenAI returned invalid JSON, using original values");
       return { name, amount };
     }
