@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import PantryForm from "./components/PantryForm";
 import PantryList from "./components/PantryList";
 import RecipeList from "./components/RecipeList";
