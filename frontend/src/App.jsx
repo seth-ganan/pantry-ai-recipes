@@ -66,13 +66,41 @@ export default function App() {
       console.error("Failed to fetch recipe details:", err);
     }
   };
-  const saveRecipe = (recipe) => {
-    setSavedRecipes((prev) => [...prev, recipe]);
-  };
+  const saveRecipe = async (recipeId) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/recipes/save/${recipeId}`, {
+      method: 'POST',
+    });
+    const updatedRecipe = await res.json();
 
-  useEffect(() => {
-    fetchPantry();
-  }, []);
+    // Update frontend savedRecipes
+    setSavedRecipes((prev) => {
+      // Avoid duplicates
+      if (prev.find(r => r._id === updatedRecipe._id)) return prev;
+      return [updatedRecipe, ...prev];
+    });
+  } catch (err) {
+    console.error('Failed to save recipe:', err);
+  }
+};
+
+const fetchSavedRecipes = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/recipes/saved`);
+    const data = await res.json();
+    setSavedRecipes(data);
+  } catch (err) {
+    console.error('Failed to fetch saved recipes:', err);
+  }
+};
+
+useEffect(() => {
+  fetchPantry();
+  fetchSavedRecipes();
+}, []);
+
+
+  
 
   return (
     <div style={{ padding: "20px" }}>
