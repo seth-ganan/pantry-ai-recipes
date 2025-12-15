@@ -42,6 +42,8 @@ router.post('/generate-details', async (req, res) => {
     if (!recipeName) return res.status(400).json({ error: 'Recipe name required' });
 
     const recipeDetails = await generateRecipeDetails(recipeName);
+    console.log("Recipe Details from GPT:", recipeDetails);
+
 
     // Save to DB
     const recipe = await Recipe.create({
@@ -57,6 +59,7 @@ router.post('/generate-details', async (req, res) => {
     res.status(500).json({ error: 'Failed to generate recipe details' });
   }
 });
+
 
 // POST save a recipe
 router.post('/save/:id', async (req, res) => {
