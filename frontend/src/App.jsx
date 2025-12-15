@@ -59,12 +59,18 @@ export default function App() {
 };
 
   // Read full recipe details
-  const readRecipe = async (name) => {
+  const readRecipe = async (recipe) => {
+    // If recipe already has ingredients/steps, just display it
+    if (recipe.ingredients && recipe.steps) {
+      setCurrentRecipe(recipe);
+      return;
+    }
+
     try {
       const res = await fetch(`${API_BASE}/api/recipes/generate-details`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ recipeName: name }),
+        body: JSON.stringify({ recipeName: recipe.name }),
       });
       const data = await res.json();
       setCurrentRecipe(data);
@@ -72,7 +78,6 @@ export default function App() {
       console.error("Failed to fetch recipe details:", err);
     }
   };
-
   // Save recipe by ID
   const saveRecipe = async (recipeId) => {
     try {

@@ -87,10 +87,14 @@ Output strictly in JSON:
     messages: [{ role: "user", content: prompt }],
     max_completion_tokens: 300
   });
+  
+  console.log("OpenAI response for recipe details:", response.choices[0].message.content);
 
   try {
     return JSON.parse(response.choices[0].message.content);
-  } catch {
+  } 
+  catch (err) {
+    console.error("Failed to parse OpenAI JSON for recipe details:", err);
     return { ingredients: [], steps: [] };
   }
 }
