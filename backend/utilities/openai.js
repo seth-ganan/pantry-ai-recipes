@@ -13,11 +13,14 @@ Input:
   amount: "${amount}"
 Output strictly as JSON:
 {
-  "name": "<standardized ingredient name>",
-  "amount": "<standardized amount>"
+  "name": "<standardized ingredient name, e.g., 'ground beef'>",
+  "amount": "<standardized amount using only these units: lb, oz, g, kg, cup, can, onion>"
 }
-No extra text, explanation, or comments.
+- Do not include anything else.
+- Ensure 'amount' is always non-empty, even if just "1 unit".
+- Standardize names by removing parentheticals or extra info like "80/20".
 `;
+
 
     const response = await openai.chat.completions.create({
       model: "gpt-5.2",
