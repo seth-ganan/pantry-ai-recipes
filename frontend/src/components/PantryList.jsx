@@ -15,7 +15,7 @@ export default function PantryList({ items, onDelete }) {
           }}
         >
           <span>
-            {item.name} - {item.amount}
+            {item.name} - {item.quantity} {item.unit}
           </span>
           <button
             onClick={() => onDelete(item._id)}
