@@ -45,22 +45,18 @@ export default function App() {
 
   // Find recipe names
   const findRecipes = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
-      const data = await res.json();
-
-      if (!Array.isArray(data)) {
-        console.warn("Backend did not return an array:", data);
-        setRecipeNames([]);
-        return;
-      }
-
-      setRecipeNames(data);
-    } catch (err) {
-      console.error("Failed to fetch recipes:", err);
-      setRecipeNames([]); // fallback
-    }
-  };
+  try {
+    console.log("Calling /api/recipes/generate-names");
+    const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
+    console.log("Response status:", res.status); // Should be 200
+    const data = await res.json();
+    console.log("Fetched recipe names:", data);
+    setRecipeNames(Array.isArray(data) ? data : []);
+  } catch (err) {
+    console.error("Failed to fetch recipes:", err);
+    setRecipeNames([]);
+  }
+};
 
   // Read full recipe details
   const readRecipe = async (name) => {
