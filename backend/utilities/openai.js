@@ -96,4 +96,4 @@ Output strictly in JSON:
 }
 
 
-module.exports = { standardizeIngredient };
+module.exports = { standardizeIngredient, generateRecipeNames, generateRecipeDetails };
