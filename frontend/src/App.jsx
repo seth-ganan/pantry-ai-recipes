@@ -43,16 +43,22 @@ export default function App() {
     }
   };
 
-  const findRecipes = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
-      const data = await res.json();
-      console.log("Fetched recipe names:", data);
-      setRecipeNames(data);
-    } catch (err) {
-      console.error("Failed to fetch recipes:", err);
+ const findRecipes = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/recipes/generate-names`);
+    const data = await res.json();
+    if (!Array.isArray(data)) {
+      console.warn("Backend did not return an array:", data);
+      setRecipeNames([]);
+      return;
     }
-  };
+    setRecipeNames(data);
+  } catch (err) {
+    console.error("Failed to fetch recipes:", err);
+    setRecipeNames([]); // fallback
+  }
+};
+
 
   const readRecipe = async (name) => {
     try {

@@ -10,21 +10,27 @@ const router = express.Router();
 router.get("/generate-names", async (req, res) => {
   try {
     const pantryItems = await Pantry.find();
-    console.log("Pantry items:", pantryItems);
+    if (!pantryItems.length) return res.json([]); // no pantry, no recipes
+
     const ingredients = pantryItems
       .map(i => `${i.quantity} ${i.unit} ${i.name}`)
       .join(", ");
-    console.log("Formatted ingredients for OpenAI:", ingredients);
 
     const recipeNames = await generateRecipeNames(ingredients);
-    console.log("Generated recipe names:", recipeNames);
+
+    // Make sure it’s always an array
+    if (!Array.isArray(recipeNames)) {
+      console.warn("generateRecipeNames did not return an array:", recipeNames);
+      return res.json([]);
+    }
 
     res.json(recipeNames);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to generate recipe names" });
+    console.error("Error generating recipe names:", err);
+    res.status(500).json([]); // return empty array instead of an object
   }
 });
+
 
 
 // POST generate full recipe details
