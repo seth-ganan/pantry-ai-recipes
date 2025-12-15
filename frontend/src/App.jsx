@@ -43,12 +43,11 @@ export default function App() {
     }
   };
 
-  // Find recipe names
   const findRecipes = async () => {
   try {
     console.log("Calling /api/recipes/generate-names");
     const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
-    console.log("Response status:", res.status); // Should be 200
+    console.log("Response status:", res.status);
     const data = await res.json();
     console.log("Fetched recipe names:", data);
     setRecipeNames(Array.isArray(data) ? data : []);
@@ -57,8 +56,7 @@ export default function App() {
     setRecipeNames([]);
   }
 };
-
-  // Read full recipe details
+  // again this is ai generated code to help with issues I was having deploying to render. It did not help very much
   const readRecipe = async (recipe) => {
     // If recipe already has ingredients/steps, just display it
     if (recipe.ingredients && recipe.steps) {
@@ -78,7 +76,7 @@ export default function App() {
       console.error("Failed to fetch recipe details:", err);
     }
   };
-  // Save recipe by ID
+
   const saveRecipe = async (recipeId) => {
     try {
       const res = await fetch(`${API_BASE}/api/recipes/save/${recipeId}`, {
@@ -95,7 +93,6 @@ export default function App() {
     }
   };
 
-  // Fetch saved recipes
   const fetchSavedRecipes = async () => {
     try {
       const res = await fetch(`${API_BASE}/api/recipes/saved`);

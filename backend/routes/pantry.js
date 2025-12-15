@@ -4,7 +4,7 @@ const { standardizeIngredient } = require("../utilities/openai");
 
 const router = express.Router();
 
-// Helper to parse amounts like "1 lb", "2 cups", "1/2 oz"
+// to help fix units, this is ai generated code
 function parseAmount(amountStr) {
   if (!amountStr || typeof amountStr !== "string") {
     return { quantity: 1, unit: "unit" };
@@ -26,7 +26,7 @@ function parseAmount(amountStr) {
     }
   }
 
-  // Extract unit
+  // Extract unit, this is ai as well, the api was giving me ingredients without any units
   let unit = cleaned.replace(numberMatch?.[0] ?? "", "").trim();
 
   const unitMap = {
@@ -76,23 +76,18 @@ router.post("/", async (req, res) => {
   }
 
   try {
-    // Standardize ingredient using OpenAI
     const standardized = await standardizeIngredient(name, amount);
 
-    // Normalize name (remove parentheses, lowercase)
+    //This is AI below, I was running into issues with merging items without it
     const normalizedName = standardized.name
       .trim()
       .toLowerCase()
       .replace(/\(.*\)/, "");
-
-    // Parse amount safely
     let { quantity, unit } = parseAmount(standardized.amount || "1 unit");
     quantity = Number.isFinite(quantity) ? quantity : 1;
+    //end of ai
     unit = unit || "unit";
-
     console.log("Adding ingredient:", { normalizedName, quantity, unit });
-
-    // Find existing item by name + unit
     const existingItem = await Pantry.findOne({ name: normalizedName, unit });
     if (existingItem) {
       existingItem.quantity += quantity;

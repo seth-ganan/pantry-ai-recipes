@@ -6,6 +6,7 @@ const openai = new OpenAI({
 
 async function standardizeIngredient(name, amount) {
   try {
+    //my nightmare to troubleshoot for real. AI would not give me good standardization for the life of me
     const prompt = `
 You are a helpful assistant that standardizes ingredient names and amounts.
 Input:
@@ -90,7 +91,7 @@ Output strictly in JSON:
 
   const text = response.choices[0].message.content;
 
-  // Try to extract JSON using regex to handle extra text
+  // This was ai code used in the attempt of fixing issues when switching to Render
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     console.error("Failed to extract JSON from GPT output:", text);

@@ -5,6 +5,8 @@ export default function RecipeList({
   saveRecipe,
   savedRecipes,
 }) {
+  //This is also ai generated code used in the attempt of fixing issues when switching to Render.
+  //probably pretty obvious due to the absolute mess of it. I hoped that it would fix my issues but alas it did not.
   return (
     <div>
       {/* Generated Recipes */}
