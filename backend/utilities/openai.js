@@ -13,36 +13,40 @@ Input:
   amount: "${amount}"
 Output strictly as JSON:
 {
-  "name": "<standardized ingredient name, e.g., 'ground beef'>",
+  "name": "<standardized ingredient name, remove any parentheses or percentages>",
   "amount": "<standardized amount using only these units: lb, oz, g, kg, cup, can, onion>"
 }
-- Do not include anything else.
-- Ensure 'amount' is always non-empty, even if just "1 unit".
-- Standardize names by removing parentheticals or extra info like "80/20".
+Rules:
+- Do NOT leave 'amount' empty. If you can't detect a number, use "1 unit".
+- Remove all parentheticals or extra descriptors from the name.
+- Only return JSON, no extra text.
 `;
-
 
     const response = await openai.chat.completions.create({
       model: "gpt-5.2",
-      messages: [
-        { role: "user", content: prompt }
-      ],
+      messages: [{ role: "user", content: prompt }],
       max_completion_tokens: 150
     });
 
     const text = response.choices[0].message.content;
 
-    const parsed = JSON.parse(text);
-    if (!parsed.name || !parsed.amount) {
-      throw new Error("Incomplete JSON returned from OpenAI");
+    let parsed;
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = { name, amount: "1 unit" };
     }
+
+    if (!parsed.name || parsed.name.trim() === "") parsed.name = name;
+    if (!parsed.amount || parsed.amount.trim() === "") parsed.amount = "1 unit";
 
     return parsed;
   } catch (err) {
     console.error("OpenAI error:", err.message);
-    return { name, amount };
+    return { name, amount: "1 unit" };
   }
 }
+
 
 async function generateRecipeNames(ingredients) {
   const prompt = `

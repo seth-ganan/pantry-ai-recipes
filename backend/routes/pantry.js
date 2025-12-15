@@ -78,19 +78,22 @@ router.post("/", async (req, res) => {
   try {
     // Standardize ingredient using OpenAI
     const standardized = await standardizeIngredient(name, amount);
-    const { quantity, unit } = parseAmount(standardized.amount);
 
-    const normalizedName = standardized.name.trim().toLowerCase();
-    const normalizedUnit = unit; // already normalized in parseAmount
+    // Normalize name (remove parentheses, lowercase)
+    const normalizedName = standardized.name
+      .trim()
+      .toLowerCase()
+      .replace(/\(.*\)/, "");
 
-    console.log("Adding ingredient:", { normalizedName, quantity, normalizedUnit });
+    // Parse amount safely
+    let { quantity, unit } = parseAmount(standardized.amount || "1 unit");
+    quantity = Number.isFinite(quantity) ? quantity : 1;
+    unit = unit || "unit";
 
-    // Find existing item by name and unit
-    const existingItem = await Pantry.findOne({
-      name: normalizedName,
-      unit: normalizedUnit
-    });
+    console.log("Adding ingredient:", { normalizedName, quantity, unit });
 
+    // Find existing item by name + unit
+    const existingItem = await Pantry.findOne({ name: normalizedName, unit });
     if (existingItem) {
       existingItem.quantity += quantity;
       await existingItem.save();
@@ -102,7 +105,7 @@ router.post("/", async (req, res) => {
     const item = await Pantry.create({
       name: standardized.name,
       quantity,
-      unit: normalizedUnit
+      unit
     });
 
     console.log("Created new item:", item);
