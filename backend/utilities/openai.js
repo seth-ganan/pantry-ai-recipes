@@ -85,19 +85,30 @@ Output strictly in JSON:
   const response = await openai.chat.completions.create({
     model: "gpt-5.2",
     messages: [{ role: "user", content: prompt }],
-    max_completion_tokens: 300
+    max_completion_tokens: 500,
   });
-  
-  console.log("OpenAI response for recipe details:", response.choices[0].message.content);
+
+  const text = response.choices[0].message.content;
+
+  // Try to extract JSON using regex to handle extra text
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    console.error("Failed to extract JSON from GPT output:", text);
+    return { ingredients: [], steps: [] };
+  }
 
   try {
-    return JSON.parse(response.choices[0].message.content);
-  } 
-  catch (err) {
-    console.error("Failed to parse OpenAI JSON for recipe details:", err);
+    const parsed = JSON.parse(jsonMatch[0]);
+    // Ensure arrays exist
+    parsed.ingredients = parsed.ingredients || [];
+    parsed.steps = parsed.steps || [];
+    return parsed;
+  } catch (err) {
+    console.error("Failed to parse JSON from GPT output:", err, text);
     return { ingredients: [], steps: [] };
   }
 }
+
 
 
 module.exports = { standardizeIngredient, generateRecipeNames, generateRecipeDetails };
