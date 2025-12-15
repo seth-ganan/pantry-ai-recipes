@@ -10,49 +10,53 @@ function parseAmount(amountStr) {
     return { quantity: 1, unit: "unit" };
   }
 
-  const match = amountStr
-    .trim()
-    .toLowerCase()
-    .match(/^([\d.\/]+)\s*(.+)$/);
+  const cleaned = amountStr.trim().toLowerCase();
 
-  if (!match) {
-    return { quantity: 1, unit: amountStr.toLowerCase() };
+  // extract number (supports fractions)
+  const numberMatch = cleaned.match(/(\d+(\.\d+)?|\d+\/\d+)/);
+  let quantity = 1;
+
+  if (numberMatch) {
+    const raw = numberMatch[0];
+    if (raw.includes("/")) {
+      const [n, d] = raw.split("/").map(Number);
+      quantity = d ? n / d : 1;
+    } else {
+      quantity = Number(raw);
+    }
   }
 
-  let quantity = match[1];
-  let unit = match[2];
-
-  if (quantity.includes("/")) {
-    const [num, den] = quantity.split("/").map(Number);
-    quantity = num / den;
-  } else {
-    quantity = Number(quantity);
-  }
+  // extract unit words
+  let unit = cleaned.replace(numberMatch?.[0] ?? "", "").trim();
 
   const unitMap = {
     pound: "lb",
     pounds: "lb",
     lbs: "lb",
     lb: "lb",
-    ounces: "oz",
     ounce: "oz",
+    ounces: "oz",
     oz: "oz",
-    grams: "g",
     gram: "g",
-    kilograms: "kg",
+    grams: "g",
     kilogram: "kg",
-    cups: "cup",
+    kilograms: "kg",
     cup: "cup",
-    cans: "can",
+    cups: "cup",
     can: "can",
-    onions: "onion",
-    onion: "onion"
+    cans: "can",
+    onion: "onion",
+    onions: "onion"
   };
 
-  unit = unitMap[unit] || unit;
+  unit = unitMap[unit] || unit || "unit";
 
-  return { quantity, unit };
+  return {
+    quantity: Number.isFinite(quantity) ? quantity : 1,
+    unit
+  };
 }
+
 
 // GET all pantry items
 router.get("/", async (req, res) => {
