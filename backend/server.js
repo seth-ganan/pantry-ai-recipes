@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://jocular-tiramisu-c373d5.netlify.app'
+    'https://pantry-ai-recipes-1.onrender.com'
   ],
   credentials: true
 }));
