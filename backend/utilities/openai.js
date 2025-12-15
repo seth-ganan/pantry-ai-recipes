@@ -62,11 +62,12 @@ No extra text.
     messages: [{ role: "user", content: prompt }],
     max_completion_tokens: 150
   });
+  console.log("OpenAI response:", response.choices[0].message.content);
 
   try {
-    console.log("OpenAI response:", response.choices[0].message.content);
     return JSON.parse(response.choices[0].message.content);
-  } catch {
+  } catch (err) {
+    console.error("Failed to parse OpenAI JSON:", err);
     return [];
   }
 }

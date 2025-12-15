@@ -7,19 +7,25 @@ const { generateRecipeNames, generateRecipeDetails } = require('../utilities/ope
 const router = express.Router();
 
 // GET recipe names from pantry ingredients
-router.get('/generate-names', async (req, res) => {
+router.get("/generate-names", async (req, res) => {
   try {
     const pantryItems = await Pantry.find();
+    console.log("Pantry items:", pantryItems);
     const ingredients = pantryItems
-    .map(i => `${i.quantity} ${i.unit} ${i.name}`)
-    .join(", ");
+      .map(i => `${i.quantity} ${i.unit} ${i.name}`)
+      .join(", ");
+    console.log("Formatted ingredients for OpenAI:", ingredients);
+
     const recipeNames = await generateRecipeNames(ingredients);
+    console.log("Generated recipe names:", recipeNames);
+
     res.json(recipeNames);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Failed to generate recipe names' });
+    res.status(500).json({ error: "Failed to generate recipe names" });
   }
 });
+
 
 // POST generate full recipe details
 router.post('/generate-details', async (req, res) => {

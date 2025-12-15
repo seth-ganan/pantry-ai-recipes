@@ -47,6 +47,7 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
       const data = await res.json();
+      console.log("Fetched recipe names:", data);
       setRecipeNames(data);
     } catch (err) {
       console.error("Failed to fetch recipes:", err);
