@@ -43,23 +43,26 @@ export default function App() {
     }
   };
 
- const findRecipes = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/recipes/generate-names`);
-    const data = await res.json();
-    if (!Array.isArray(data)) {
-      console.warn("Backend did not return an array:", data);
-      setRecipeNames([]);
-      return;
+  // Find recipe names
+  const findRecipes = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/recipes/generate-names`);
+      const data = await res.json();
+
+      if (!Array.isArray(data)) {
+        console.warn("Backend did not return an array:", data);
+        setRecipeNames([]);
+        return;
+      }
+
+      setRecipeNames(data);
+    } catch (err) {
+      console.error("Failed to fetch recipes:", err);
+      setRecipeNames([]); // fallback
     }
-    setRecipeNames(data);
-  } catch (err) {
-    console.error("Failed to fetch recipes:", err);
-    setRecipeNames([]); // fallback
-  }
-};
+  };
 
-
+  // Read full recipe details
   const readRecipe = async (name) => {
     try {
       const res = await fetch(`${API_BASE}/api/recipes/generate-details`, {
@@ -73,41 +76,39 @@ export default function App() {
       console.error("Failed to fetch recipe details:", err);
     }
   };
+
+  // Save recipe by ID
   const saveRecipe = async (recipeId) => {
-  try {
-    const res = await fetch(`${API_BASE}/api/recipes/save/${recipeId}`, {
-      method: 'POST',
-    });
-    const updatedRecipe = await res.json();
+    try {
+      const res = await fetch(`${API_BASE}/api/recipes/save/${recipeId}`, {
+        method: "POST",
+      });
+      const updatedRecipe = await res.json();
 
-    // Update frontend savedRecipes
-    setSavedRecipes((prev) => {
-      // Avoid duplicates
-      if (prev.find(r => r._id === updatedRecipe._id)) return prev;
-      return [updatedRecipe, ...prev];
-    });
-  } catch (err) {
-    console.error('Failed to save recipe:', err);
-  }
-};
+      setSavedRecipes((prev) => {
+        if (prev.find((r) => r._id === updatedRecipe._id)) return prev;
+        return [updatedRecipe, ...prev];
+      });
+    } catch (err) {
+      console.error("Failed to save recipe:", err);
+    }
+  };
 
-const fetchSavedRecipes = async () => {
-  try {
-    const res = await fetch(`${API_BASE}/api/recipes/saved`);
-    const data = await res.json();
-    setSavedRecipes(data);
-  } catch (err) {
-    console.error('Failed to fetch saved recipes:', err);
-  }
-};
+  // Fetch saved recipes
+  const fetchSavedRecipes = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/recipes/saved`);
+      const data = await res.json();
+      setSavedRecipes(data);
+    } catch (err) {
+      console.error("Failed to fetch saved recipes:", err);
+    }
+  };
 
-useEffect(() => {
-  fetchPantry();
-  fetchSavedRecipes();
-}, []);
-
-
-  
+  useEffect(() => {
+    fetchPantry();
+    fetchSavedRecipes();
+  }, []);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -125,8 +126,8 @@ useEffect(() => {
         recipeNames={recipeNames}
         readRecipe={readRecipe}
         currentRecipe={currentRecipe}
-        saveRecipe={saveRecipe} 
-        savedRecipes={savedRecipes} 
+        saveRecipe={saveRecipe}
+        savedRecipes={savedRecipes}
       />
     </div>
   );
