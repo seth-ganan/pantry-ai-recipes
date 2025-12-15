@@ -64,27 +64,9 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST new pantry item
-router.post("/", async (req, res) => {
-  console.log("POST body:", req.body);
-  const { name, amount } = req.body;
-
-  if (!name || !amount) return res.status(400).json({ error: "Name & amount required" });
-
-  try {
-    const standardized = await standardizeIngredient(name, amount);
-    const item = await Pantry.create({ 
-        name: standardized.name, 
-        amount: standardized.amount});
-    res.status(201).json(item);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Failed to add pantry item" });
-  }
-});
 
 
-// PUT update pantry item
+// POST update pantry item
 router.post("/", async (req, res) => {
   const { name, amount } = req.body;
 
