@@ -10,26 +10,35 @@ const router = express.Router();
 router.get("/generate-names", async (req, res) => {
   try {
     const pantryItems = await Pantry.find();
-    if (!pantryItems.length) return res.json([]); // no pantry, no recipes
+    if (!pantryItems.length) return res.json([]);
 
     const ingredients = pantryItems
       .map(i => `${i.quantity} ${i.unit} ${i.name}`)
       .join(", ");
 
-    const recipeNames = await generateRecipeNames(ingredients);
+    console.log("Ingredients for recipe generation:", ingredients);
 
-    // Make sure it’s always an array
-    if (!Array.isArray(recipeNames)) {
-      console.warn("generateRecipeNames did not return an array:", recipeNames);
-      return res.json([]);
+    let recipeNames = [];
+    try {
+      recipeNames = await generateRecipeNames(ingredients);
+    } catch (err) {
+      console.error("OpenAI call failed:", err);
+      recipeNames = [];
     }
 
+    if (!Array.isArray(recipeNames)) {
+      console.warn("generateRecipeNames did not return an array:", recipeNames);
+      recipeNames = [];
+    }
+
+    console.log("Recipe names returned:", recipeNames);
     res.json(recipeNames);
   } catch (err) {
-    console.error("Error generating recipe names:", err);
-    res.status(500).json([]); // return empty array instead of an object
+    console.error("Unexpected error in /generate-names:", err);
+    res.json([]); // always return an array
   }
 });
+
 
 
 
