@@ -64,6 +64,7 @@ No extra text.
   });
 
   try {
+    console.log("OpenAI response:", response.choices[0].message.content);
     return JSON.parse(response.choices[0].message.content);
   } catch {
     return [];

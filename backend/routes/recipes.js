@@ -10,7 +10,9 @@ const router = express.Router();
 router.get('/generate-names', async (req, res) => {
   try {
     const pantryItems = await Pantry.find();
-    const ingredients = pantryItems.map(i => `${i.quantity} ${i.unit} ${i.name}`).join(', ');
+    const ingredients = pantryItems
+    .map(i => `${i.quantity} ${i.unit} ${i.name}`)
+    .join(", ");
     const recipeNames = await generateRecipeNames(ingredients);
     res.json(recipeNames);
   } catch (err) {
