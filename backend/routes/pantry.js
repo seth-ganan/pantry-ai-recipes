@@ -26,7 +26,6 @@ function parseAmount(amountStr) {
     }
   }
 
-  // extract unit words
   let unit = cleaned.replace(numberMatch?.[0] ?? "", "").trim();
 
   const unitMap = {
@@ -81,7 +80,9 @@ router.post("/", async (req, res) => {
   try {
     const standardized = await standardizeIngredient(name, amount);
     const { quantity, unit } = parseAmount(standardized.amount);
+
     const normalizedName = standardized.name.trim().toLowerCase();
+
     const existingItem = await Pantry.findOne({
       name: { $regex: `^${normalizedName}$`, $options: "i" },
       unit
@@ -92,6 +93,7 @@ router.post("/", async (req, res) => {
       await existingItem.save();
       return res.status(200).json(existingItem);
     }
+
     const item = await Pantry.create({
       name: standardized.name,
       quantity,
@@ -100,10 +102,11 @@ router.post("/", async (req, res) => {
 
     res.status(201).json(item);
   } catch (err) {
-    console.error(err);
+    console.error("Pantry POST error:", err);
     res.status(500).json({ error: "Failed to add pantry item" });
   }
 });
+
 
 // DELETE pantry item
 router.delete("/:id", async (req, res) => {
