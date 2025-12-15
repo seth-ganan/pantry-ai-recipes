@@ -3,6 +3,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const pantryRoutes = require("./routes/pantry");
+const recipeRoutes = require("./routes/recipes");
 
 
 
@@ -19,6 +20,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use("/api/pantry", pantryRoutes);
+app.use("/api/recipes", recipeRoutes);
 
 
 // MongoDB Connection
