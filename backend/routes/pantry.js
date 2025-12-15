@@ -2,9 +2,9 @@ const express = require("express");
 const Pantry = require("../models/Pantry");
 const { standardizeIngredient } = require("../utilities/openai");
 
-
 const router = express.Router();
 
+// Helper to parse amounts like "1 lb", "2 cups", "1/2 oz"
 function parseAmount(amountStr) {
   if (!amountStr || typeof amountStr !== "string") {
     return { quantity: 1, unit: "unit" };
@@ -12,7 +12,7 @@ function parseAmount(amountStr) {
 
   const cleaned = amountStr.trim().toLowerCase();
 
-  // extract number (supports fractions)
+  // Extract number (supports fractions)
   const numberMatch = cleaned.match(/(\d+(\.\d+)?|\d+\/\d+)/);
   let quantity = 1;
 
@@ -26,6 +26,7 @@ function parseAmount(amountStr) {
     }
   }
 
+  // Extract unit
   let unit = cleaned.replace(numberMatch?.[0] ?? "", "").trim();
 
   const unitMap = {
@@ -56,7 +57,6 @@ function parseAmount(amountStr) {
   };
 }
 
-
 // GET all pantry items
 router.get("/", async (req, res) => {
   try {
@@ -67,9 +67,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-
-
-// POST update pantry item
+// POST add/update pantry item
 router.post("/", async (req, res) => {
   const { name, amount } = req.body;
 
@@ -78,28 +76,36 @@ router.post("/", async (req, res) => {
   }
 
   try {
+    // Standardize ingredient using OpenAI
     const standardized = await standardizeIngredient(name, amount);
     const { quantity, unit } = parseAmount(standardized.amount);
 
     const normalizedName = standardized.name.trim().toLowerCase();
+    const normalizedUnit = unit; // already normalized in parseAmount
 
+    console.log("Adding ingredient:", { normalizedName, quantity, normalizedUnit });
+
+    // Find existing item by name and unit
     const existingItem = await Pantry.findOne({
-      name: { $regex: `^${normalizedName}$`, $options: "i" },
-      unit
+      name: normalizedName,
+      unit: normalizedUnit
     });
 
     if (existingItem) {
       existingItem.quantity += quantity;
       await existingItem.save();
+      console.log("Merged with existing item:", existingItem);
       return res.status(200).json(existingItem);
     }
 
+    // Create new pantry item
     const item = await Pantry.create({
       name: standardized.name,
       quantity,
-      unit
+      unit: normalizedUnit
     });
 
+    console.log("Created new item:", item);
     res.status(201).json(item);
   } catch (err) {
     console.error("Pantry POST error:", err);
@@ -107,17 +113,17 @@ router.post("/", async (req, res) => {
   }
 });
 
-
 // DELETE pantry item
 router.delete("/:id", async (req, res) => {
-    try {
-        const item = await Pantry.findByIdAndDelete(req.params.id);
-        if (!item) {
-            return res.status(404).json({ error: "Pantry item not found" });
-        }
-        res.json({ message: "Pantry item deleted" });
-    } catch (err) {
-        res.status(500).json({ error: "Failed to delete item" });
+  try {
+    const item = await Pantry.findByIdAndDelete(req.params.id);
+    if (!item) {
+      return res.status(404).json({ error: "Pantry item not found" });
     }
+    res.json({ message: "Pantry item deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete item" });
+  }
 });
+
 module.exports = router;
